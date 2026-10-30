@@ -1,0 +1,37 @@
+# =====================================================================
+# ROOT RENDER DEPLOYMENT BLUEPRINT
+# =====================================================================
+services:
+  - type: web
+    name: visioninsight-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://visioninsight-client.vercel.app
+      - key: CLIENT_URL
+        value: https://visioninsight-client.vercel.app
+
