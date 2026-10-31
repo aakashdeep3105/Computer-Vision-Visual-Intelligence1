@@ -148,6 +148,8 @@ CLIENT_URL=https://visioninsight-client.vercel.app
 
 From the root directory:
 
+The local Vite client defaults to `http://localhost:5000/api`; set `VITE_API_BASE_URL` to override it and restart Vite after changing the value. Authentication uses a bearer token in the `Authorization` header, not cross-origin cookies.
+
 ```bash
 # 1. Run Client System (Vite)
 npm run client

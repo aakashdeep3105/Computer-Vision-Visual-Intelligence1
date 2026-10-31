@@ -51,21 +51,16 @@ const corsOptions = {
     // Allow non-browser requests (e.g. curl, postman, mobile apps)
     if (!origin) return callback(null, true);
 
-    // Dynamic match for localhost with any port, 127.0.0.1 with any port, Vercel deployments, or development mode
+    // Allow local development ports and configured or deployed Vercel frontends.
     const isAllowed =
       allowedOrigins.includes(origin) ||
       /^http:\/\/localhost(:\d+)?$/.test(origin) ||
       /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin) ||
-      /\.vercel\.app$/.test(origin) ||
-      process.env.NODE_ENV === 'development';
+      /\.vercel\.app$/.test(origin);
 
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Fallback: allow origin in development/local
-    }
+    callback(null, isAllowed);
   },
-  credentials: true,
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   exposedHeaders: ['Authorization'],
@@ -74,21 +69,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-
-// Secondary guarantee middleware for CORS headers and OPTIONS preflight
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  }
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  next();
-});
 
 // High-capacity JSON parser for Base64 multimodal visual payloads
 app.use(express.json({ limit: '50mb' }));
@@ -163,4 +143,3 @@ async function startServer() {
 }
 
 startServer();
-
