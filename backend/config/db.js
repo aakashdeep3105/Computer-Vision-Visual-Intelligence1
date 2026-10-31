@@ -31,6 +31,17 @@ function loadLocalFallback() {
       if (!localData.scans) localData.scans = [];
       if (!localData.anomalies) localData.anomalies = [];
     }
+
+    // Ensure Demo Operator account always exists for instant 1-click test
+    if (!localData.users.find(u => u.email.toLowerCase() === 'demo.operator@visioninsight.ai')) {
+      localData.users.push({
+        id: 'd3m00000-0000-0000-0000-000000000001',
+        email: 'demo.operator@visioninsight.ai',
+        password_hash: '$2a$10$fd1ZEbwhf9sQKxmKEnSCqOhGEtqU5c/ldYPeP0Zgm0MycfgRcEs3.',
+        created_at: new Date().toISOString()
+      });
+      saveLocalFallback();
+    }
   } catch (err) {
     console.error('[Fallback DB] Failed to load persistent fallback store:', err.message);
   }
@@ -101,6 +112,11 @@ export async function initDB() {
           action_required TEXT NOT NULL,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- Seed default demo operator if not exists
+        INSERT INTO users (email, password_hash)
+        VALUES ('demo.operator@visioninsight.ai', '$2a$10$fd1ZEbwhf9sQKxmKEnSCqOhGEtqU5c/ldYPeP0Zgm0MycfgRcEs3.')
+        ON CONFLICT (email) DO NOTHING;
       `);
 
       client.release();
